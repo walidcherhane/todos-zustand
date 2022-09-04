@@ -1,3 +1,5 @@
+import create from "zustand";
+
 // Standard interface and functions
 export interface Todo {
   id: number;
@@ -28,3 +30,37 @@ export const addTodo = (todos: Todo[], text: string): Todo[] => [
     done: false,
   },
 ];
+
+// store
+
+type Store = {
+  todos: Todo[];
+  newTodo: string;
+  addTodo: () => void;
+  updateTodo: (id: number, text: string) => void;
+  toggleTodo: (id: number) => void;
+  removeTodo: (id: number) => void;
+  setNewTodo: (text: string) => void;
+  loadTodos: (todos: Todo[]) => void;
+};
+
+const useStore = create<Store>((set) => ({
+  todos: [] as Todo[],
+  newTodo: "",
+  loadTodos: (todos) => {
+    set({ todos });
+  },
+  setNewTodo: (text: string) => {
+    set({ newTodo: text });
+  },
+  addTodo: () =>
+    set((state) => ({ todos: addTodo(state.todos, state.newTodo) })),
+  updateTodo: (id: number, text: string) =>
+    set((state) => ({ todos: updateTodo(state.todos, id, text) })),
+  toggleTodo: (id: number) =>
+    set((state) => ({ todos: toggleTodo(state.todos, id) })),
+  removeTodo: (id: number) =>
+    set((state) => ({ todos: removeTodo(state.todos, id) })),
+}));
+
+export default useStore;
